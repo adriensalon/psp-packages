@@ -1,0 +1,29 @@
+pkgname=imgui
+pkgver="1.92.5"
+pkgrel=1
+pkgdesc="Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies (docking branch)"
+arch=(any)
+url="https://github.com/adriensalon/imgui_psp"
+license=("MIT")
+groups=("pspdev-default")
+depends=()
+makedepends=()
+optdepends=()
+source=("$pkgname::git+https://github.com/adriensalon/imgui_psp.git#tag=v${pkgver}")
+sha256sums=("SKIP")
+
+prepare() {
+    cd "$srcdir/$pkgname"
+    git submodule update --init --recursive
+}
+
+build() {
+    cd "$srcdir/$pkgname"
+    psp-cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/psp "${XTRA_OPTS[@]}" || { exit 1; }
+    make --quiet $MAKEFLAGS || { exit 1; }
+}
+
+package() {
+    cd "$srcdir/$pkgname"
+    make --quiet ${MAKEFLAGS} DESTDIR="$pkgdir" install
+}
